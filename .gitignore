@@ -1,2 +1,3 @@
 
 server/src/main/resources/application-dev.yml
+server/src/main/resources/application.yml

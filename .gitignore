@@ -5,3 +5,4 @@ build/resources/main/application.yml
 build/resources/main/application-dev.yml
 /.idea
 /build
+/out

@@ -6,3 +6,5 @@ build/resources/main/application-dev.yml
 /.idea
 /build
 /out
+/.gradle
+**.DS_Store

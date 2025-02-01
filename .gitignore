@@ -8,3 +8,4 @@ build/resources/main/application-dev.yml
 /out
 /.gradle
 **.DS_Store
+.DS_Store

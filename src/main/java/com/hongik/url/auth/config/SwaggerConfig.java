@@ -33,8 +33,8 @@ public class SwaggerConfig {
 
     private Info apiInfo() {
         return new Info()
-                .title("etk") // API의 제목
-                .description("시선추적 키보드") // API에 대한 설명
+                .title("무인연구실") // API의 제목
+                .description("URL") // API에 대한 설명
                 .version("v1"); // API의 버전
     }
 }

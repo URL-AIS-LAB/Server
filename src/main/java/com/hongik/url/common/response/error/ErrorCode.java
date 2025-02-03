@@ -26,6 +26,8 @@ public enum ErrorCode {
      * 401 Unauthorized
      */
     UNAUTHORIZE("인증에 실패하였습니다."),
+    WRONG_USERNAME("잘못된 아이디입니다"),
+    WRONG_PASSWORD("잘못된 비밀번호입니다"),
 
     /**
      * 403 Forbidden

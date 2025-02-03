@@ -1,12 +1,15 @@
-package com.hongik.url.common.config;
+package com.hongik.url.auth.config;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 @Configuration
 public class SwaggerConfig {
@@ -30,8 +33,8 @@ public class SwaggerConfig {
 
     private Info apiInfo() {
         return new Info()
-                .title("ceos-vote 과제") // API의 제목
-                .description("ceos -vote 과제 화이팅 합시당") // API에 대한 설명
+                .title("etk") // API의 제목
+                .description("시선추적 키보드") // API에 대한 설명
                 .version("v1"); // API의 버전
     }
 }

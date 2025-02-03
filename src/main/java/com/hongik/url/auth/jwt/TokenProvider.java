@@ -1,23 +1,11 @@
-package com.hongik.url.common.auth.jwt;
+package com.hongik.url.auth.jwt;
 
-import com.hongik.url.common.auth.dto.TokenDto;
-import com.hongik.url.common.auth.service.CustomUserDetails;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.UnsupportedJwtException;
+import com.hongik.url.auth.CustomUserDetails;
+import com.hongik.url.auth.dto.TokenDto;
+import com.hongik.url.auth.service.CustomUserDetailsService;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SecurityException;
-
-import java.security.Key;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +14,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
+
+import java.security.Key;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -36,15 +30,15 @@ public class TokenProvider implements InitializingBean {
     private final String secret;
     private Key key;
 
-    private final JwtUserDetailsService jwtUserDetailsService;
+    private final CustomUserDetailsService customUserDetailsService;
 
     public TokenProvider(@Value("${jwt.secret}") String secret,
-            @Value("${jwt.validationTime}") Long validationTime,
-            JwtUserDetailsService jwtUserDetailsService) {
+                         @Value("${jwt.validationTime}") Long validationTime,
+                         CustomUserDetailsService customUserDetailsService) {
         this.secret = secret;
-        this.validationTime = validationTime * 1000;
-        this.refreshTokenValidationTime = validationTime * 2 * 1000;
-        this.jwtUserDetailsService = jwtUserDetailsService;
+        this.validationTime = validationTime * 60000 * 60;  // accessToken 만료: validationTime 시간
+        this.refreshTokenValidationTime = this.validationTime * 24 * 7;
+        this.customUserDetailsService = customUserDetailsService;
     }
 
     @Override
@@ -63,7 +57,7 @@ public class TokenProvider implements InitializingBean {
         long now = (new Date()).getTime();
 
         String accessToken = Jwts.builder()
-                .setHeaderParam("typ","JWT")
+                .setHeaderParam("typ", "JWT")
                 .setExpiration(new Date(now + validationTime))//토큰 만료시간 payload 에 exp 의 형태로
                 .setSubject(authentication.getName()) //토큰 sub (토큰 제목)
                 .claim(AUTHORIZATION_KEY, authorities)// auth 라는 key 로 authroities 즉 General or ADMIN 이 들어감
@@ -72,7 +66,7 @@ public class TokenProvider implements InitializingBean {
 
 
         String refreshToken = Jwts.builder()
-                .setHeaderParam("type","JWT")
+                .setHeaderParam("type", "JWT")
                 .setExpiration(new Date(now + refreshTokenValidationTime))
                 .signWith(this.key, SignatureAlgorithm.HS512)
                 .compact();
@@ -97,7 +91,7 @@ public class TokenProvider implements InitializingBean {
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
 
-        CustomUserDetails principal = (CustomUserDetails) jwtUserDetailsService.loadUserByUsername(claims.getSubject());
+        CustomUserDetails principal = (CustomUserDetails) customUserDetailsService.loadUserByUsername(claims.getSubject());
 
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
@@ -107,29 +101,29 @@ public class TokenProvider implements InitializingBean {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
-        } catch(MalformedJwtException | SecurityException e) {
+        } catch (MalformedJwtException | SecurityException e) {
             log.info("잘못된 형식의 토큰입니다.");
-        } catch(ExpiredJwtException e) {
+        } catch (ExpiredJwtException e) {
             log.info("만료된 토큰입니다.");
-        } catch(UnsupportedJwtException e) {
+        } catch (UnsupportedJwtException e) {
             log.info("지원하지 않는 형식의 토큰입니다.");
-        } catch(IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             log.info("잘못된 토큰입니다.");
         }
         return false;
     }
 
     public Claims parseData(String token) {
-        try{
+        try {
 
             return Jwts.parserBuilder()
                     .setSigningKey(this.key)
                     .build().parseClaimsJws(token).getBody();
-        }
-        catch (ExpiredJwtException e){
+        } catch (ExpiredJwtException e) {
             return e.getClaims();
         }
     }
+
     public Long getExpiration(String accessToken) {
         // accessToken 남은 유효시간
         Date expiration = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken).getBody().getExpiration();
@@ -139,3 +133,4 @@ public class TokenProvider implements InitializingBean {
     }
 
 }
+

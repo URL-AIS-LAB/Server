@@ -1,8 +1,7 @@
-package com.hongik.url.common.auth.dto;
+package com.hongik.url.auth.dto;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.http.ResponseCookie;
 
 @Getter
 public class TokenReIssueResponseDto {

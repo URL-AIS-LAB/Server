@@ -1,4 +1,4 @@
-package com.hongik.url.common.auth.dto;
+package com.hongik.url.auth.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

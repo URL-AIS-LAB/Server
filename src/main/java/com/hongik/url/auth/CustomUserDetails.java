@@ -1,46 +1,39 @@
-package com.hongik.url.common.auth.service;
-
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
+package com.hongik.url.auth;
 
 import com.hongik.url.user.domain.entity.User;
+import io.jsonwebtoken.lang.Assert;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.SpringSecurityCoreVersion;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.util.Assert;
+
+import java.io.Serializable;
+import java.util.*;
 
 @RequiredArgsConstructor
 public class CustomUserDetails implements UserDetails, CredentialsContainer {
 
     private final String username;
-    private  String password;
+    private String password;
     private final boolean enabled;
     private final boolean accountNonExpired;
     private final boolean credentialsNonExpired;
     private final boolean accountNonLocked;
     private final Set<GrantedAuthority> authorities;
 
+    @Getter
     private final User user;
 
-    public User getUser(){
-        return user;
-    }
-
-    public CustomUserDetails(String username,String password,
-            Collection<? extends GrantedAuthority> authorities, User user){
-        this(username, password, true, true, true, true, authorities,user);
+    public CustomUserDetails(String username, String password,
+                             Collection<? extends GrantedAuthority> authorities, User user) {
+        this(username, password, true, true, true, true, authorities, user);
     }
 
     public CustomUserDetails(String username, String password, boolean enabled, boolean accountNonExpired,
-            boolean credentialsNonExpired, boolean accountNonLocked,
-            Collection<? extends GrantedAuthority> authorities, User user) {
+                             boolean credentialsNonExpired, boolean accountNonLocked,
+                             Collection<? extends GrantedAuthority> authorities, User user) {
         Assert.isTrue(username != null && !"".equals(username) && password != null,
                 "Cannot pass null or empty values to constructor");
         this.username = username;
@@ -71,9 +64,12 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
 
     /**
      * 현재 로그인한 유저의 pk 조회용 로직
+     *
      * @return
      */
-    public Long getId(){return this.user.getId();}
+    public Long getId() {
+        return this.user.getId();
+    }
 
     @Override
     public boolean isEnabled() {
@@ -168,8 +164,5 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
         }
 
     }
-
-
-
 
 }

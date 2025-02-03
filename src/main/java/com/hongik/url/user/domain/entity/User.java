@@ -42,7 +42,7 @@ public class User extends BaseEntity {
 
     public void changeRole(){
         if(this.role == Role.ADMIN){
-            this.role = Role.GENERAL;
+            this.role = Role.USER;
         } else{
             this.role = Role.ADMIN;
         }
